@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Landing Page</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1e1e2f, #3a3a52);
+            color: white;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            position: fixed;
+            width: 100%;
+            top: 0;
+            left: 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+
+        .hamburger {
+            cursor: pointer;
+            font-size: 30px;
+            transition: all 0.3s ease;
+            display: block;
+        }
+
+        .balance {
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .profile img {
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            object-fit: cover;
+        }
+
+        .menu {
+            display: none;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            background: rgba(0, 0, 0, 0.8);
+            width: 250px;
+            height: 100%;
+            text-align: center;
+            padding: 30px 20px;
+            transition: transform 0.3s ease;
+            transform: translateX(-100%);
+            z-index: 1001;
+        }
+
+        .menu.active {
+            display: flex;
+            transform: translateX(0);
+        }
+
+        .menu a {
+            color: white;
+            text-decoration: none;
+            padding: 12px;
+            display: block;
+            font-size: 18px;
+            transition: background-color 0.3s;
+        }
+
+        .menu a:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 1000;
+            transition: opacity 0.3s ease;
+            opacity: 0;
+        }
+
+        .overlay.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .main {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            background: linear-gradient(to right, black, #0707ee);
+        }
+
+        .transfer-container {
+            display: flex; /* Use flexbox to align transfer section and animation */
+            align-items: center; /* Vertically align items */
+            justify-content: center;
+            width: 80%;
+            max-width: 800px;
+            margin-top: 50px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .transfer-section {
+            text-align: center;
+            padding: 20px;
+            position: relative; /* Required for absolute coin positioning */
+            flex: 1; /* Take up 1/2 the space */
+        }
+
+        .transfer-section h2 {
+            margin-bottom: 20px;
+        }
+
+        .transfer-section input, .transfer-section button {
+            display: block;
+            width: 80%;
+            margin: 10px auto;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            outline: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+        .transfer-section input::placeholder {
+            color: white;
+            opacity: 0.8;
+        }
+
+        .transfer-section input:focus {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .transfer-section button {
+            background: linear-gradient(to right, #ff8800, #ff5500);
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, background 0.3s;
+            font-weight: bold;
+        }
+
+        .transfer-section button:hover {
+            transform: scale(1.05);
+            background: linear-gradient(to right, #ff5500, #ff2200);
+        }
+
+        .animation-container {
+            flex: 1; /* Take up 1/2 the space */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 200px; /* Adjust the height to fit the animation */
+        }
+
+        .coin {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: gold;
+            position: absolute;
+            top: 50%;
+            left: 10%;
+            transform: translateY(-50%);
+            animation: transferCoin 2s forwards;
+            display: none;
+        }
+
+        @keyframes transferCoin {
+            0% {
+                left: 10%;
+                transform: translateY(-50%) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-60%) rotate(180deg);
+            }
+            100% {
+                left: 90%;
+                transform: translateY(-50%) rotate(360deg);
+            }
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .transfer-container {
+                flex-direction: column; /* Stack the section and animation vertically */
+                width: 95%;
+            }
+
+            .animation-container {
+                min-height: 100px;
+                padding: 10px;
+            }
+            .transfer-section {
+                width: 95%; /* Take up more space on smaller screens */
+            }
+
+            .balance, .profile {
+                font-size: 16px;
+            }
+        }
+
+        /* CSS for the SVG animation */
+        .money-transfer-animation {
+            width: 100%; /* Occupy the entire animation container */
+            height: 100%;
+        }
+    </style>
+
+</head>
+<body>
+<div class="main">
+
+    <div class="overlay" id="overlay"></div>
+    <nav class="navbar">
+        <div class="hamburger" onclick="toggleMenu()">☰</div>
+        <div class="balance"></div>
+        <div class="profile">
+            <img src="https://images.rawpixel.com/image_png_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTAxL3JtNjA5LXNvbGlkaWNvbi13LTAwMi1wLnBuZw.png"
+                 alt="User">
+            <span>John Doe</span>
+        </div>
+    </nav>
+    <div class="menu" id="menu">
+        <a href="#">Home</a>
+        <a href="#">Transactions</a>
+        <a href="#">Settings</a>
+        <a href="#">Home</a>
+        
+    </div>
+
+    <div class="transfer-container">
+        <div class="transfer-section">
+            <h2>Transfer Funds</h2>
+            <input type="text" id="senderNumber" placeholder="Sender Number" required>
+            <input type="text" id="receiverNumber" placeholder="Receiver Number" required>
+            <input type="number" id="amount" placeholder="Amount" required>
+            <button onclick="transferFunds()">Transfer</button>
+            <div class="coin" id="coin"></div>
+        </div>
+
+        <div class="animation-container">
+          <svg class="money-transfer-animation" viewBox="0 0 200 100">
+             <defs>
+                 <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                     <stop offset="0%"   stop-color="#FFD700" />
+                     <stop offset="100%" stop-color="#FF8C00" />
+                 </linearGradient>
+             </defs>
+
+             <!-- Wallets -->
+             <rect x="10" y="20" width="40" height="60" fill="#333" rx="5"/>
+             <rect x="150" y="20" width="40" height="60" fill="#333" rx="5"/>
+
+             <!-- Money Flow (animated line) -->
+             <path id="moneyFlow" d="M30,50 Q100,20 170,50" stroke="url(#gradient)" stroke-width="4" fill="none" stroke-linecap="round">
+                 <animate attributeName="stroke-dasharray" from="0,200" to="200,0" dur="2s" repeatCount="1" fill="freeze"/>
+             </path>
+
+              <!-- Wallet Labels -->
+              <text x="10" y="15" font-size="10" fill="white">Sender</text>
+              <text x="150" y="15" font-size="10" fill="white">Receiver</text>
+         </svg>
+
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p>© 2025 Your Company. All rights reserved.</p>
+    </footer>
+</div>
+<script>
+    const balance=5000;
+    document.querySelector('.balance').innerText = 'Balance: $' + balance;
+
+    function toggleMenu() {
+        const menu = document.getElementById('menu');
+        const overlay = document.getElementById('overlay');
+        menu.classList.toggle('active');
+        overlay.classList.toggle('active');
+    }
+
+    document.getElementById('overlay').addEventListener('click', function () {
+        toggleMenu();
+    });
+
+    function transferFunds() {
+        const senderNumber = document.getElementById('senderNumber').value;
+        const receiverNumber = document.getElementById('receiverNumber').value;
+        const amount = document.getElementById('amount').value;
+        const coin = document.getElementById('coin');
+        const moneyFlow = document.getElementById('moneyFlow');
+
+
+        if (!senderNumber || !receiverNumber || !amount) {
+            alert("Please fill in all fields.");
+            return;
+        }
+
+        else if(amount > balance){
+            alert("Insufficient balance.");
+            return;
+        }
+       
+
+        //Coin animation
+        coin.style.display = 'block';
+        coin.style.animation = 'none';
+        void coin.offsetWidth;
+        coin.style.animation = 'transferCoin 2s forwards';
+        // SVG animation
+        moneyFlow.style.display = 'block';
+        moneyFlow.style.strokeDasharray = '0,200';
+        void moneyFlow.offsetWidth;
+        moneyFlow.style.animation = 'none'
+        moneyFlow.style.animation = 'dash 2s linear forwards'
+
+         //Keyframes to display dash path
+        const styleSheet = document.createElement("style")
+        styleSheet.innerHTML = `@keyframes dash {
+          to {
+            stroke-dashoffset: 1000;
+          }
+        }`
+        document.head.appendChild(styleSheet)
+
+
+        setTimeout(() => {
+            coin.style.display = 'none';
+             styleSheet.remove()
+             moneyFlow.style.animation = 'none'
+            alert(`Transfer successful!\nFrom: ${senderNumber}\nTo: ${receiverNumber}\nAmount: $${amount}`);
+        }, 2000);
+      
+
+          
+        }
+    
+</script>
+</body>
+</html>
